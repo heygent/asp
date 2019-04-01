@@ -9,7 +9,7 @@ c = clingo.Control()
 c.load("calendario.cl")
 c.ground(parts=[("base", [])])
 
-HEADERS = ['ora', 'lun', 'mar', 'mer', 'gio', 'ven']
+HEADERS = ['lun', 'mar', 'mer', 'gio', 'ven']
 
 with c.solve(yield_=True) as solve_handle:
   for model in solve_handle:
@@ -21,11 +21,11 @@ with c.solve(yield_=True) as solve_handle:
     for orario_symbol in filter(lambda s: s.name == 'orario', symbols):
       classe, giorno, ora, materia = map(str, orario_symbol.arguments)
       ora = int(ora)
-      orario.setdefault(classe, { 'ora': list(range(1, 7)) })
+      orario.setdefault(classe, {})
       orario[classe].setdefault(giorno, [None for _ in range(6)])
       orario[classe][giorno][ora - 1] = materia
 
     for classe, orario_classe in sorted(orario.items()):
       print(f'Classe {classe}:\n')
-      print(tabulate(orario_classe, headers=HEADERS))
+      print(tabulate(orario_classe, headers=HEADERS, showindex=range(1,7)))
       print('\n')
