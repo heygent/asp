@@ -26,6 +26,5 @@ with c.solve(yield_=True) as solve_handle:
       orario[classe][giorno][ora - 1] = materia
 
     for classe, orario_classe in sorted(orario.items()):
-      print(f'Classe {classe}:\n')
+      print(f'\nClasse {classe}\n')
       print(tabulate(orario_classe, headers=HEADERS, showindex=range(1,7)))
-      print('\n')
