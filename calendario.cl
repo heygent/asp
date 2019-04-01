@@ -32,4 +32,11 @@ ora(1..6).
 OreMateria { orario(Classe, Giorno, Ora, Materia) : ora(Ora), giorno(Giorno) } OreMateria 
 :- classe(Classe), ore_per_materia(Materia, OreMateria).
 
+conflitto_orario :- 
+  orario(Classe, Giorno, Ora, Materia1),
+  orario(Classe, Giorno, Ora, Materia2),
+  Materia1 != Materia2.
+
+:- conflitto_orario.
+
 #show orario/4.
