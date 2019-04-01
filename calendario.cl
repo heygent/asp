@@ -29,8 +29,7 @@ classe(a1; a2; a3; b1; b2; b3).
 giorno(lun; mar; mer; gio; ven).
 ora(1..6).
 
-OreMateria {
-   orario(Classe, Giorno, Ora, Materia) : ora(Ora), giorno(Giorno) 
-} OreMateria :- classe(Classe), ore_per_materia(Materia, OreMateria).
+OreMateria { orario(Classe, Giorno, Ora, Materia) : ora(Ora), giorno(Giorno) } OreMateria 
+:- classe(Classe), ore_per_materia(Materia, OreMateria).
 
 #show orario/4.
