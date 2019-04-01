@@ -1,4 +1,5 @@
 out/
+.vscode/
+*.exe
 *.org
 sol.txt
-*.exe
