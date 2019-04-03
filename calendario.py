@@ -9,7 +9,7 @@ c = clingo.Control()
 c.load("calendario.cl")
 c.ground(parts=[("base", [])])
 
-HEADERS = ['lun', 'mar', 'mer', 'gio', 'ven']
+HEADERS = ['lunedi', 'martedi', 'mercoledi', 'giovedi', 'venerdi']
 
 with c.solve(yield_=True) as solve_handle:
   for model in solve_handle:
