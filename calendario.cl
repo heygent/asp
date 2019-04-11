@@ -70,11 +70,20 @@ materia(X) :- ore_per_materia(X, _).
 OreMateria { orario(Classe, Giorno, Ora, Materia, Docente) : ora(Ora), giorno(Giorno), docente(Materia, Docente) } OreMateria 
 :- classe(Classe), ore_per_materia(Materia, OreMateria).
 
-% Vincolo: La stessa classe non può avere due materie diverse nella stessa ora
+%% Vincoli
+
+% La stessa classe non può avere due materie diverse nella stessa ora
 
 :- 
   orario(Classe, Giorno, Ora, Materia1, _),
   orario(Classe, Giorno, Ora, Materia2, _),
   Materia1 != Materia2.
+
+% La stessa classe non può avere la stessa materia con docenti diversi
+
+:- 
+  orario(Classe, _, _, Materia, Docente1),
+  orario(Classe, _, _, Materia, Docente2),
+  Docente1 != Docente2.
 
 #show orario/5.
