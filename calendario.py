@@ -19,7 +19,7 @@ with c.solve(yield_=True) as solve_handle:
     orario = {}
 
     for orario_symbol in filter(lambda s: s.name == 'orario', symbols):
-      classe, giorno, ora, materia = map(str, orario_symbol.arguments)
+      classe, giorno, ora, materia, *_ = map(str, orario_symbol.arguments)
       ora = int(ora)
       orario.setdefault(classe, {})
       orario[classe].setdefault(giorno, [None for _ in range(6)])

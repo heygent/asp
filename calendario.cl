@@ -1,49 +1,54 @@
-%8 aule
+% Aule
+
 aula(
-  lettere1;
-  lettere2;
-  matematica;
-  tecnologia;
-  musica;
-  inglese;
-  spagnolo;
-  religione
+  aula_lettere1;
+  aula_lettere2;
+  aula_matematica;
+  aula_tecnologia;
+  aula_musica;
+  aula_inglese;
+  aula_spagnolo;
+  aula_religione;
+  lab_arte;
+  lab_scienze;
+  lab_ed_fisica
 ).
 
-%3 lab
-lab(arte; scienze; educazione_fisica).
+% Docenti
 
-%docenti
 docente(
-  doc_lettedre1; 
-  doc_lettere2; 
-  doc_mate_scienze1; 
-  doc_mate_scienze2; 
-  doc_mate_scienze3; 
-  doc_mate_scienze4;
-  doc_tecnologia; 
-  doc_musica; 
-  doc_inglese; 
-  doc_spagnolo; 
-  doc_religione
+  lettere, "Lucia Lettere1"; 
+  lettere, "Annalisa Lettere2"; 
+  matematica, "Pozzo Matematica";
+  scienze, "Paolo Scienze1"; 
+  scienze, "Andrea Scienze2"; 
+  scienze, "Luca Scienze3"; 
+  scienze, "Gianni Scienze4";
+  inglese, "Michele inglese"; 
+  spagnolo, "Pierpaolo spagnolo"; 
+  musica, "Ernesto musica"; 
+  tecnologia, "Tecna Tecnologia"; 
+  arte, "Picassa Arte";
+  ed_fisica, "Pantani Michele EdFisica";
+  religione, "SanGiuseppe religione"
 ).
 
-%materie
-materia(lettere; matematica; tecnologia; musica; inglese; spagnolo; religione).
+% Classi
 
-%tipi di classe
 classe(a1; a2; b1; b2; c1; c2).
 
-%giornisettimana
+% Giorni della settimana
+
 giorno(lunedi; martedi; mercoledi; giovedi; venerdi).
 
-%ore
+% Possibili ore di lezione
 ora(1..6).
 
 %ad ogni giorno della settimana  assegna  6 materie
 %6 {assegna(P,T) : materia(P)} 6 :- giorno(T).
 
-%ore per materia 
+% Ore da assegnare nell'orario per ciascuna materia
+
 ore_per_materia(
   lettere, 10; 
   matematica, 4;
@@ -57,17 +62,18 @@ ore_per_materia(
   religione, 1
 ).
 
+% Le materie disponibili
+
+materia(X) :- ore_per_materia(X, _).
+
+OreMateria { orario(Classe, Giorno, Ora, Materia, Docente) : ora(Ora), giorno(Giorno), docente(Materia, Docente) } OreMateria 
+:- classe(Classe), ore_per_materia(Materia, OreMateria).
+
 % Vincolo: La stessa classe non può avere due materie diverse nella stessa ora
 
 :- 
-  orario(Classe, Giorno, Ora, Materia1),
-  orario(Classe, Giorno, Ora, Materia2),
+  orario(Classe, Giorno, Ora, Materia1, _),
+  orario(Classe, Giorno, Ora, Materia2, _),
   Materia1 != Materia2.
 
-OreMateria { orario(Classe, Giorno, Ora, Materia) : ora(Ora), giorno(Giorno) } OreMateria 
-:- classe(Classe), ore_per_materia(Materia, OreMateria).
-
-
-#show orario/4.
-
-
+#show orario/5.
