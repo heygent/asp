@@ -42,10 +42,8 @@ classe(a1; a2; b1; b2; c1; c2).
 giorno(lunedi; martedi; mercoledi; giovedi; venerdi).
 
 % Possibili ore di lezione
-ora(1..6).
 
-%ad ogni giorno della settimana  assegna  6 materie
-%6 {assegna(P,T) : materia(P)} 6 :- giorno(T).
+ora(1..6).
 
 % Ore da assegnare nell'orario per ciascuna materia
 
@@ -65,6 +63,9 @@ ore_per_materia(
 % Le materie disponibili
 
 materia(X) :- ore_per_materia(X, _).
+
+% Crea n fatti 'orario' per ogni n := numero di ore in ore_per_materia,
+% associando informazioni sull'ora, il giorno e il docente.
 
 OreMateria { orario(Classe, Giorno, Ora, Materia, Docente) : ora(Ora), giorno(Giorno), docente(Materia, Docente) } OreMateria 
 :- classe(Classe), ore_per_materia(Materia, OreMateria).
