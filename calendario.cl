@@ -33,6 +33,13 @@ docente(
   religione, "SanGiuseppe religione"
 ).
 
+% Le materie che i docenti sono abilitati ad insegnare.
+
+% Ogni docente può insegnare la propria materia.
+docente_puo_insegnare(Materia, Docente) :- docente(Materia, Docente).
+% I docenti di matematica possono insegnare scienze.
+docente_puo_insegnare(scienze, Docente) :- docente(matematica, Docente).
+
 % Classi
 
 classe(a1; a2; b1; b2; c1; c2).
@@ -65,25 +72,43 @@ ore_per_materia(
 materia(X) :- ore_per_materia(X, _).
 
 % Crea n fatti 'orario' per ogni n := numero di ore in ore_per_materia,
-% associando informazioni sull'ora, il giorno e il docente.
+% associando informazioni sull'ora e il giorno.
 
-OreMateria { orario(Classe, Giorno, Ora, Materia, Docente) : ora(Ora), giorno(Giorno), docente(Materia, Docente) } OreMateria 
-:- classe(Classe), ore_per_materia(Materia, OreMateria).
+OreMateria { 
+    orario(Classe, Giorno, Ora, Materia) : ora(Ora), giorno(Giorno) 
+} OreMateria :- classe(Classe), ore_per_materia(Materia, OreMateria).
+
+% Per ogni possibile coppia (Classe, Materia) assegna un docente che può 
+% insegnare quella materia.
+
+1 { 
+  classe_ha_docente(Classe, Materia, Docente)
+  : docente_puo_insegnare(Materia, Docente) 
+} 1 :- classe(Classe), materia(Materia).
+
 
 %% Vincoli
 
-% La stessa classe non può avere due materie diverse nella stessa ora
+% La stessa classe non può avere due materie diverse nella stessa ora.
 
 :- 
-  orario(Classe, Giorno, Ora, Materia1, _),
-  orario(Classe, Giorno, Ora, Materia2, _),
+  orario(Classe, Giorno, Ora, Materia1),
+  orario(Classe, Giorno, Ora, Materia2),
   Materia1 != Materia2.
 
-% La stessa classe non può avere la stessa materia con docenti diversi
+% Lo stesso docente non può insegnare in due classi contemporaneamente.
 
-:- 
-  orario(Classe, _, _, Materia, Docente1),
-  orario(Classe, _, _, Materia, Docente2),
-  Docente1 != Docente2.
+:-
+  orario(Classe1, Giorno, Ora, Materia1),
+  orario(Classe2, Giorno, Ora, Materia2),
+  Classe1 != Classe2,
+  classe_ha_docente(Classe1, Materia1, Docente),
+  classe_ha_docente(Classe2, Materia2, Docente).
 
-#show orario/5.
+% Tutti i docenti devono avere una classe assegnata.
+
+:- docente(_, Docente), not classe_ha_docente(_, _, Docente).
+
+
+#show orario/4.
+#show classe_ha_docente/3.
