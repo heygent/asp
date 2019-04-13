@@ -29,8 +29,8 @@ docente(
   musica, "Ernesto musica"; 
   tecnologia, "Tecna Tecnologia"; 
   arte, "Picassa Arte";
-  ed_fisica, "Pantani Michele EdFisica";
-  religione, "SanGiuseppe religione"
+  ed_fisica, "Pantani EdFisica";
+  religione, "SanPeppe religione"
 ).
 
 % Le materie che i docenti sono abilitati ad insegnare.

@@ -28,22 +28,30 @@ class RigaOrario(NamedTuple):
     materia: str
 
 
-SYMBOL_RE = r"\w[\d\w]*"
-NUMBER_RE = r"\d+"
-STRING_RE = r'"[^"]*"'
+SYMBOL_RE = r"(?P<{}>\w[\d\w]*)"
+NUMBER_RE = r"(?P<{}>\d+)"
+STRING_RE = r'"(?P<{}>[^"]*)"'
 
-ORARIO_ARGS = [
+
+def make_predicate_re(name, arglist):
+    args_re = r',\s*'.join(
+        regex.format(name) for name, regex in arglist
+    )
+    return re.compile(rf"{name}\({args_re}\)")
+
+
+ORARIO_RE = make_predicate_re('orario', [
     ('classe', SYMBOL_RE),
     ('giorno', SYMBOL_RE),
     ('ora', NUMBER_RE),
     ('materia', SYMBOL_RE),
-]
+])
 
-ORARIO_ARGS_RE = r',\s*'.join(
-    r"(?P<{}>{})".format(name, regex) for name, regex in ORARIO_ARGS
-)
-
-ORARIO_RE = re.compile(rf"orario\({ORARIO_ARGS_RE}\)")
+CLASSE_HA_DOCENTE_RE = make_predicate_re('classe_ha_docente', [
+    ('classe', SYMBOL_RE),
+    ('materia', SYMBOL_RE),
+    ('docente', STRING_RE),
+])
 
 
 def parse_orario(text):
@@ -55,7 +63,12 @@ def parse_orario(text):
         yield RigaOrario(**groupdict)
 
 
-def transform_for_tabulate(righe_orario: List[RigaOrario]):
+def parse_classe_ha_docente(text):
+    for match in CLASSE_HA_DOCENTE_RE.finditer(text):
+        yield match.groups()
+
+
+def make_orario_table_dicts(righe_orario: List[RigaOrario]):
     orario = {}
 
     for classe, giorno, ora, materia, *_ in righe_orario:
@@ -66,6 +79,21 @@ def transform_for_tabulate(righe_orario: List[RigaOrario]):
 
     return orario
 
+def make_docenti_table_dict(pred_tuples):
+    pred_tuples = sorted(pred_tuples)
+
+    docenti = {}
+    for classe, _, docente in pred_tuples:
+        docenti.setdefault(classe, [])
+        docenti[classe].append(docente)
+    
+    materie = []
+    for _, materia, _ in pred_tuples:
+        if materia in materie:
+            break
+        materie.append(materia)
+
+    return docenti, materie
 
 if __name__ == '__main__':
 
@@ -83,8 +111,13 @@ if __name__ == '__main__':
 
     righe = list(parse_orario(input_str))
     righe.sort()
-    orario = transform_for_tabulate(righe)
+    orario = make_orario_table_dicts(righe)
 
-    for classe, orario_classe in orario.items():
+    for classe, orario_dict in orario.items():
         print(f'\nClasse {classe}\n')
-        print(tabulate(orario_classe, headers='keys', showindex=range(1, 7)))
+        print(tabulate(orario_dict, headers='keys', showindex=range(1, 7)))
+
+    docenti = list(parse_classe_ha_docente(input_str))
+    docenti, materie = make_docenti_table_dict(docenti)
+    print('\nDocenti\n')
+    print(tabulate(docenti, headers='keys', showindex=materie)) 
