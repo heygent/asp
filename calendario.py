@@ -26,7 +26,6 @@ class RigaOrario(NamedTuple):
     giorno: GiornoSettimana
     ora: int
     materia: str
-    docente: str
 
 
 SYMBOL_RE = r"\w[\d\w]*"
@@ -38,7 +37,6 @@ ORARIO_ARGS = [
     ('giorno', SYMBOL_RE),
     ('ora', NUMBER_RE),
     ('materia', SYMBOL_RE),
-    ('docente', STRING_RE),
 ]
 
 ORARIO_ARGS_RE = r',\s*'.join(
