@@ -77,7 +77,7 @@ def make_orario_table_dicts(righe_orario: List[RigaOrario]):
         giorno = giorno.name
         orario.setdefault(classe, {})
         orario[classe].setdefault(giorno, [None for _ in range(6)])
-        orario[classe][giorno][ora - 1] = (materia, aula)
+        orario[classe][giorno][ora - 1] = '\n'.join((materia, aula))
 
     return orario
 
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 
     for classe, orario_dict in orario.items():
         print(f'\nClasse {classe}\n')
-        print(tabulate(orario_dict, headers='keys', showindex=range(1, 7)))
+        print(tabulate(orario_dict, tablefmt='grid', headers='keys', showindex=range(1, 7)))
 
     docenti = list(parse_classe_ha_docente(input_str))
     docenti, materie = make_docenti_table_dict(docenti)
