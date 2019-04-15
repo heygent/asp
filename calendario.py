@@ -26,6 +26,7 @@ class RigaOrario(NamedTuple):
     giorno: GiornoSettimana
     ora: int
     materia: str
+    aula: str
 
 
 SYMBOL_RE = r"(?P<{}>\w[\d\w]*)"
@@ -45,6 +46,7 @@ ORARIO_RE = make_predicate_re('orario', [
     ('giorno', SYMBOL_RE),
     ('ora', NUMBER_RE),
     ('materia', SYMBOL_RE),
+    ('aula', SYMBOL_RE),
 ])
 
 CLASSE_HA_DOCENTE_RE = make_predicate_re('classe_ha_docente', [
@@ -71,11 +73,11 @@ def parse_classe_ha_docente(text):
 def make_orario_table_dicts(righe_orario: List[RigaOrario]):
     orario = {}
 
-    for classe, giorno, ora, materia, *_ in righe_orario:
+    for classe, giorno, ora, materia, aula, *_ in righe_orario:
         giorno = giorno.name
         orario.setdefault(classe, {})
         orario[classe].setdefault(giorno, [None for _ in range(6)])
-        orario[classe][giorno][ora - 1] = materia
+        orario[classe][giorno][ora - 1] = (materia, aula)
 
     return orario
 
