@@ -1,3 +1,4 @@
+
 % Aule
 
 aule_per_materia(
@@ -116,12 +117,39 @@ OreMateria {
 
 :- docente(_, Docente), not classe_ha_docente(_, _, Docente).
 
-%non possono esserci due lezioni nella stessa aula 
+%non possono esserci due lezioni nella stessa aula con due classi diverse e  materie diverse
 :-
-orario(Aula, Classe1, Giorno, Ora, Materia),
-orario(Aula, Classe2, Giorno, Ora, Materia),
+orario(Classe1, Giorno, Ora, Materia1,Aula),
+orario(Classe2, Giorno, Ora, Materia2,Aula),
+Classe1 != Classe2,
+Materia1 != Materia2.
+
+%materie uguali e classi diverse
+:-
+orario(Classe1, Giorno, Ora, Materia,Aula),
+orario(Classe2, Giorno, Ora, Materia2,Aula),
+Classe1 != Classe2.
+
+%materie diverse e classi uguali
+:-
+orario(Classe1, Giorno, Ora, Materia,Aula),
+orario(Classe2, Giorno, Ora, Materia2,Aula),
+Classe1 != Classe2.
+
+%stessa classe  e materia 
+:-
+orario(Classe1, Giorno, Ora, Materia,Aula),
+orario(Classe2, Giorno, Ora, Materia2,Aula),
 Classe1 != Classe2.
 
 
+
+
+
+
+
+
+
+
 #show orario/5.
-#show classe_ha_docente/3.
+%#show classe_ha_docente/3.
