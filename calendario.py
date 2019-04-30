@@ -8,6 +8,7 @@ Richiede la libreria `tabulate` (in Ubuntu: `sudo apt install python-tabulate`)
 
 import re
 import sys
+import argparse
 from enum import IntEnum, auto
 from typing import List, NamedTuple
 from tabulate import tabulate
@@ -19,6 +20,9 @@ class GiornoSettimana(IntEnum):
     mercoledi = auto() 
     giovedi = auto()
     venerdi = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class RigaOrario(NamedTuple):
@@ -97,29 +101,35 @@ def make_docenti_table_dict(pred_tuples):
 
     return docenti, materie
 
-if __name__ == '__main__':
-
-    if len(sys.argv) > 2:
-        print(f"USAGE: {sys.argv[0]} [FILENAME or -]")
-        exit(1)
-
-    if len(sys.argv) < 2 or sys.argv[1] == '-':
-        input_file = sys.stdin
-    else:
-        input_file = open(sys.argv[1])
-
-    with input_file as input_stream:
-        input_str = input_stream.read()
-
-    righe = list(parse_orario(input_str))
-    righe.sort()
+def make_summary(righe: List[RigaOrario], docenti):
     orario = make_orario_table_dicts(righe)
 
     for classe, orario_dict in orario.items():
         print(f'\nClasse {classe}\n')
         print(tabulate(orario_dict, tablefmt='grid', headers='keys', showindex=range(1, 7)))
 
-    docenti = list(parse_classe_ha_docente(input_str))
     docenti, materie = make_docenti_table_dict(docenti)
     print('\nDocenti\n')
     print(tabulate(docenti, headers='keys', showindex=materie)) 
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--tsv', action='store_true')
+    parser.add_argument('infile', type=argparse.FileType('r'),
+                        nargs='?', default=sys.stdin)
+    ns = parser.parse_args()
+
+    with ns.infile:
+        input_str = ns.infile.read()
+
+    righe = sorted(parse_orario(input_str))
+    docenti = sorted(parse_classe_ha_docente(input_str))
+
+    if ns.tsv:
+        print('\t'.join(RigaOrario._fields))
+        for riga in righe:
+            print('\t'.join(map(str, riga)))
+    else:
+        make_summary(righe, docenti)
