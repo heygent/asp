@@ -88,26 +88,20 @@ OreMateria {
 } 1 :- classe(Classe), materia(Materia).
 
 
-
-%1 {aula_assegnata(Aula, Classe, Giorno, Ora, Materia) : aule_per_materia(Materia,Aula)} 1  
-%:- orario(Classe, Giorno, Ora, Materia).
-
-
-
 %% Vincoli
 
 % La stessa classe non può avere due materie diverse nella stessa ora.
 
 :- 
-  orario(Classe, Giorno, Ora, Materia1,Aula),
-  orario(Classe, Giorno, Ora, Materia2,Aula),
+  orario(Classe, Giorno, Ora, Materia1, _),
+  orario(Classe, Giorno, Ora, Materia2, _),
   Materia1 != Materia2.
 
 % Lo stesso docente non può insegnare in due classi contemporaneamente.
 
 :-
-  orario(Classe1, Giorno, Ora, Materia1,Aula),
-  orario(Classe2, Giorno, Ora, Materia2,Aula),
+  orario(Classe1, Giorno, Ora, Materia1, _),
+  orario(Classe2, Giorno, Ora, Materia2, _),
   Classe1 != Classe2,
   classe_ha_docente(Classe1, Materia1, Docente),
   classe_ha_docente(Classe2, Materia2, Docente).
@@ -116,11 +110,18 @@ OreMateria {
 
 :- docente(_, Docente), not classe_ha_docente(_, _, Docente).
 
-%non possono esserci due lezioni nella stessa aula 
-:-
-orario(Aula, Classe1, Giorno, Ora, Materia),
-orario(Aula, Classe2, Giorno, Ora, Materia),
-Classe1 != Classe2.
+% La stessa classe non può avere lezione nella stessa ora in due aule diverse.
+
+:- 
+  orario(Classe, Giorno, Ora, _, Aula1),
+  orario(Classe, Giorno, Ora, _, Aula2),
+  Aula1 != Aula2.
+
+% Non possono esserci due lezioni nella stessa aula.
+% :-
+% orario(Aula, Classe1, Giorno, Ora, Materia),
+% orario(Aula, Classe2, Giorno, Ora, Materia),
+% Classe1 != Classe2.
 
 
 #show orario/5.
