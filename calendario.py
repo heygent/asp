@@ -9,81 +9,69 @@ Richiede la libreria `tabulate` (in Ubuntu: `sudo apt install python-tabulate`)
 import re
 import sys
 import argparse
-from enum import IntEnum, auto
-from typing import List, NamedTuple
+from enum import IntEnum
+from collections import namedtuple
 from tabulate import tabulate
-
-
-class GiornoSettimana(IntEnum):
-    lunedi = auto() 
-    martedi = auto()
-    mercoledi = auto() 
-    giovedi = auto()
-    venerdi = auto()
-
-    def __str__(self):
-        return self.name
-
-
-class RigaOrario(NamedTuple):
-    classe: str
-    giorno: GiornoSettimana
-    ora: int
-    materia: str
-    aula: str
-
 
 SYMBOL_RE = r"(?P<{}>\w[\d\w]*)"
 NUMBER_RE = r"(?P<{}>\d+)"
 STRING_RE = r'"(?P<{}>[^"]*)"'
 
 
-def make_predicate_re(name, arglist):
-    args_re = r',\s*'.join(
-        regex.format(name) for name, regex in arglist
-    )
-    return re.compile(rf"{name}\({args_re}\)")
+class PredicateParser:
+    def __init__(self, name, arglist):
+        self.arglist = arglist
+        args_re = r',\s*'.join(
+            regex.format(name) for name, regex, *_ in arglist)
+        self.re = re.compile(rf"{name}\({args_re}\)")
+        self.result_tuple = namedtuple(name,
+                                       [argname for argname, *_ in arglist])
+
+    def parse(self, input_str):
+        for match in self.re.finditer(input_str):
+            parsed_args = match.groupdict()
+            for argname, _, argtype in self.arglist:
+                parsed_args[argname] = argtype(parsed_args[argname])
+
+            yield self.result_tuple(**parsed_args)
 
 
-ORARIO_RE = make_predicate_re('orario', [
-    ('classe', SYMBOL_RE),
-    ('giorno', SYMBOL_RE),
-    ('ora', NUMBER_RE),
-    ('materia', SYMBOL_RE),
-    ('aula', SYMBOL_RE),
+class GiornoSettimana(IntEnum):
+    lunedi = 1
+    martedi = 2
+    mercoledi = 3
+    giovedi = 4
+    venerdi = 5
+
+    def __str__(self):
+        return self.name
+
+
+ORARIO_PARSER = PredicateParser('orario', [
+    ('classe', SYMBOL_RE, str),
+    ('giorno', SYMBOL_RE, GiornoSettimana.__getitem__),
+    ('ora', NUMBER_RE, int),
+    ('materia', SYMBOL_RE, str),
+    ('aula', SYMBOL_RE, str),
 ])
 
-CLASSE_HA_DOCENTE_RE = make_predicate_re('classe_ha_docente', [
-    ('classe', SYMBOL_RE),
-    ('materia', SYMBOL_RE),
-    ('docente', STRING_RE),
+CLASSE_HA_DOCENTE_PARSER = PredicateParser('classe_ha_docente', [
+    ('classe', SYMBOL_RE, str),
+    ('materia', SYMBOL_RE, str),
+    ('docente', STRING_RE, str),
 ])
 
 
-def parse_orario(text):
-    for match in ORARIO_RE.finditer(text):
-        groupdict = match.groupdict()
-        groupdict['ora'] = int(groupdict['ora'])
-        groupdict['giorno'] = GiornoSettimana[groupdict['giorno']]
-
-        yield RigaOrario(**groupdict)
-
-
-def parse_classe_ha_docente(text):
-    for match in CLASSE_HA_DOCENTE_RE.finditer(text):
-        yield match.groups()
-
-
-def make_orario_table_dicts(righe_orario: List[RigaOrario]):
+def make_orario_table_dicts(righe_orario):
     orario = {}
 
     for classe, giorno, ora, materia, aula, *_ in righe_orario:
-        giorno = giorno.name
         orario.setdefault(classe, {})
         orario[classe].setdefault(giorno, [None for _ in range(6)])
         orario[classe][giorno][ora - 1] = '\n'.join((materia, aula))
 
     return orario
+
 
 def make_docenti_table_dict(pred_tuples):
     pred_tuples = sorted(pred_tuples)
@@ -92,7 +80,7 @@ def make_docenti_table_dict(pred_tuples):
     for classe, _, docente in pred_tuples:
         docenti.setdefault(classe, [])
         docenti[classe].append(docente)
-    
+
     materie = []
     for _, materia, _ in pred_tuples:
         if materia in materie:
@@ -101,35 +89,42 @@ def make_docenti_table_dict(pred_tuples):
 
     return docenti, materie
 
-def make_summary(righe: List[RigaOrario], docenti):
+
+def print_summary(righe, docenti):
     orario = make_orario_table_dicts(righe)
 
     for classe, orario_dict in orario.items():
         print(f'\nClasse {classe}\n')
-        print(tabulate(orario_dict, tablefmt='grid', headers='keys', showindex=range(1, 7)))
+        print(
+            tabulate(orario_dict,
+                     tablefmt='grid',
+                     headers='keys',
+                     showindex=range(1, 7)))
 
     docenti, materie = make_docenti_table_dict(docenti)
     print('\nDocenti\n')
-    print(tabulate(docenti, headers='keys', showindex=materie)) 
+    print(tabulate(docenti, headers='keys', showindex=materie))
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--tsv', action='store_true')
-    parser.add_argument('infile', type=argparse.FileType('r'),
-                        nargs='?', default=sys.stdin)
+    parser.add_argument('infile',
+                        type=argparse.FileType('r'),
+                        nargs='?',
+                        default=sys.stdin)
     ns = parser.parse_args()
 
     with ns.infile:
         input_str = ns.infile.read()
 
-    righe = sorted(parse_orario(input_str))
-    docenti = sorted(parse_classe_ha_docente(input_str))
+    righe = sorted(ORARIO_PARSER.parse(input_str))
+    docenti = sorted(CLASSE_HA_DOCENTE_PARSER.parse(input_str))
 
     if ns.tsv:
-        print('\t'.join(RigaOrario._fields))
+        print('\t'.join(ORARIO_PARSER.result_tuple._fields))
         for riga in righe:
             print('\t'.join(map(str, riga)))
     else:
-        make_summary(righe, docenti)
+        print_summary(righe, docenti)
