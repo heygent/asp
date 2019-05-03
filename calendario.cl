@@ -118,10 +118,11 @@ OreMateria {
   Aula1 != Aula2.
 
 % Non possono esserci due lezioni nella stessa aula.
-% :-
-% orario(Aula, Classe1, Giorno, Ora, Materia),
-% orario(Aula, Classe2, Giorno, Ora, Materia),
-% Classe1 != Classe2.
+ :-
+ orario(Classe1, Giorno, Ora, _, Aula),
+ orario(Classe2, Giorno, Ora, _, Aula),
+ Classe1 != Classe2.
+%Materia1 != Materia2.
 
 
 #show orario/5.
