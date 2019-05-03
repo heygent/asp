@@ -11,6 +11,7 @@ import sys
 import argparse
 from enum import IntEnum
 from collections import namedtuple
+from itertools import groupby
 from tabulate import tabulate
 
 SYMBOL_RE = r"(?P<{}>\w[\d\w]*)"
@@ -62,20 +63,16 @@ CLASSE_HA_DOCENTE_PARSER = PredicateParser('classe_ha_docente', [
 ])
 
 
-def make_orario_table_dicts(righe_orario):
-    orario = {}
+def make_classe_table_dict(righe_orario):
+    orario = { giorno: [] for giorno in GiornoSettimana }
 
-    for classe, giorno, ora, materia, aula, *_ in righe_orario:
-        orario.setdefault(classe, {})
-        orario[classe].setdefault(giorno, [None for _ in range(6)])
-        orario[classe][giorno][ora - 1] = '\n'.join((materia, aula))
+    for _, giorno, ora, materia, aula, *_ in righe_orario:
+        orario[giorno].append('\n'.join((str(ora), materia, aula)))
 
     return orario
 
 
 def make_docenti_table_dict(pred_tuples):
-    pred_tuples = sorted(pred_tuples)
-
     docenti = {}
     for classe, _, docente in pred_tuples:
         docenti.setdefault(classe, [])
@@ -91,12 +88,12 @@ def make_docenti_table_dict(pred_tuples):
 
 
 def print_summary(righe, docenti):
-    orario = make_orario_table_dicts(righe)
+    for classe, righe_classe in groupby(righe, lambda r: r.classe):
+        orario_classe = make_classe_table_dict(righe_classe)
 
-    for classe, orario_dict in orario.items():
         print(f'\nClasse {classe}\n')
         print(
-            tabulate(orario_dict,
+            tabulate(orario_classe,
                      tablefmt='grid',
                      headers='keys',
                      showindex=range(1, 7)))
@@ -127,4 +124,5 @@ if __name__ == '__main__':
         for riga in righe:
             print('\t'.join(map(str, riga)))
     else:
+        print(input_str)
         print_summary(righe, docenti)
