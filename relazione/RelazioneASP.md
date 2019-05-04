@@ -11,10 +11,10 @@ toc-own-page: true
 
 # Introduzione
 
-L'esercitazione prevedeva la creazione di un calendario scolastico secondo vari
-requisiti, tramite l'uso dell'applicativo clingo. In seguito spieghiamo come
-abbiamo soddisfatto i requisiti richiesti, spiegando mano a mano il codice che
-abbiamo usato.
+l'obiettivo di questa esercitazione è quello di creare un calendario accademico
+attraverso l'applicativo Clingo, parleremo di come abbiamo definito la
+base di conoscienza, gli aggregati, i vincoli e di come abbiamo gestito l'output
+di clingo al fine di rendere la visualizzazione dei dati più agevole.
 
 ## Base di conoscenza 
 
