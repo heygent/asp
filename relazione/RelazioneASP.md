@@ -42,6 +42,41 @@ Per codificare la situazione iniziale, abbiamo usato vari
 
 ## Aggregati 
 
+Abbiamo fatto ricorso agli aggregati per l'assegnazione delle ore di studio alle
+classi e per l'assegnazione delle classi ai professori. Abbiamo scelto di
+separare l'assegnazione delle materie alle classi da quelle dei docenti
+partendo dal presupposto che ogni classe avesse sempre lo stesso docente per una
+determinata materia. Se si parte da questo assunto, sono necessarie meno
+assegnazioni di docenti che di ore.
+
+Un'alternativa sarebbe potuta essere assegnare il docente e le ore in un unico
+aggregato, per poi stabilire che la materia dovesse essere insegnata sempre
+dallo stesso docente usando un vincolo. Abbiamo preferito l'approccio usato
+perché rende più esplicita la cardinalità delle assegnazioni al docente, e
+perché permette di ridurre la complessità degli aggregati separando le due
+problematiche.
+
+```prolog
+OreMateria { 
+    orario(Classe, Giorno, Ora, Materia, Aula) : 
+    ora(Ora), giorno(Giorno), aule_per_materia(Materia, Aula)
+} OreMateria :- classe(Classe), ore_per_materia(Materia, OreMateria).
+```
+
+L'intenzione nell'usare i termini `classe(Classe)` e `ore_per_materia(Materia,
+OreMateria)` nel corpo della regola è di rendere vera la testa per ogni
+possibile istanziazione della tripletta delle variabili, andando a fare
+un'operazione analoga al prodotto cartesiano. 
+
+Nella base di conoscenza abbiamo incluso informazioni sulle ore che vogliamo far
+assegnare a ciascuna classe per ogni singola materia nel termine
+`ore_per_materia(Materia, OreMateria)`. Possiamo quindi usare la variabile
+`OreMateria` per stabilire quante volte creare il termine `orario`, in modo che
+ce ne sia uno per ogni ora che vogliamo assegnare.
+
+In `orario`, andiamo ad assegnare anche le 
+
+
 ## Vincoli 
 
 ## Output
