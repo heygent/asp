@@ -1,44 +1,4 @@
-% Aule
-
-aule_per_materia(
-    lettere,aula_lettere1;
-    lettere,aula_lettere2;
-    matematica,aula_matematica;
-    scienze,lab_scienze;
-    inglese,aula_inglese;
-    spagnolo,aula_spagnolo;
-    musica,aula_musica;
-    tecnologia, aula_tecnologia;
-    arte,lab_arte;
-    ed_fisica,lab_ed_fisica;
-    religione,aula_religione
-).
-
-% Docenti
-
-docente(
-  lettere, "Lucia Lettere1"; 
-  lettere, "Annalisa Lettere2"; 
-  matematica, "Pozzo Matematica";
-  scienze, "Paolo Scienze1"; 
-  scienze, "Andrea Scienze2"; 
-  scienze, "Luca Scienze3"; 
-  scienze, "Gianni Scienze4";
-  inglese, "Michele inglese"; 
-  spagnolo, "Pierpaolo spagnolo"; 
-  musica, "Ernesto musica"; 
-  tecnologia, "Tecna Tecnologia"; 
-  arte, "Picassa Arte";
-  ed_fisica, "Pantani EdFisica";
-  religione, "SanPeppe religione"
-).
-
-% Le materie che i docenti sono abilitati ad insegnare.
-
-% Ogni docente può insegnare la propria materia.
-docente_puo_insegnare(Materia, Docente) :- docente(Materia, Docente).
-% I docenti di matematica possono insegnare scienze.
-docente_puo_insegnare(scienze, Docente) :- docente(matematica, Docente).
+%% Base di conoscenza
 
 % Classi
 
@@ -71,22 +31,65 @@ ore_per_materia(
 
 materia(X) :- ore_per_materia(X, _).
 
+% Aule
+
+aule_per_materia(
+    lettere, aula_lettere1;
+    lettere, aula_lettere2;
+    matematica, aula_matematica;
+    scienze, lab_scienze;
+    inglese, aula_inglese;
+    spagnolo, aula_spagnolo;
+    musica, aula_musica;
+    tecnologia, aula_tecnologia;
+    arte, lab_arte;
+    ed_fisica, lab_ed_fisica;
+    religione, aula_religione
+).
+
+% Docenti
+
+docente(
+  lettere, "Lucia Lettere1"; 
+  lettere, "Annalisa Lettere2"; 
+  matematica, "Pozzo Matematica";
+  scienze, "Paolo Scienze1"; 
+  scienze, "Andrea Scienze2"; 
+  scienze, "Luca Scienze3"; 
+  scienze, "Gianni Scienze4";
+  inglese, "Michele inglese"; 
+  spagnolo, "Pierpaolo spagnolo"; 
+  musica, "Ernesto musica"; 
+  tecnologia, "Tecna Tecnologia"; 
+  arte, "Picassa Arte";
+  ed_fisica, "Pantani EdFisica";
+  religione, "SanPeppe religione"
+).
+
+% Le materie che i docenti sono abilitati ad insegnare.
+
+% Ogni docente può insegnare la propria materia.
+docente_puo_insegnare(Materia, Docente) :- docente(Materia, Docente).
+% I docenti di matematica possono insegnare scienze.
+docente_puo_insegnare(scienze, Docente) :- docente(matematica, Docente).
+
+%% Aggregati
+
 % Crea n fatti 'orario' per ogni n = numero di ore in ore_per_materia,
 % associando informazioni sull'ora e il giorno.
 
 OreMateria { 
     orario(Classe, Giorno, Ora, Materia, Aula) : 
-    ora(Ora), giorno(Giorno), aule_per_materia(Materia,Aula)
+    ora(Ora), giorno(Giorno), aule_per_materia(Materia, Aula)
 } OreMateria :- classe(Classe), ore_per_materia(Materia, OreMateria).
 
 % Per ogni possibile coppia (Classe, Materia) assegna un docente che può 
 % insegnare quella materia.
 
 1 { 
-  classe_ha_docente(Classe, Materia, Docente)
-  : docente_puo_insegnare(Materia, Docente) 
+  classe_ha_docente(Classe, Materia, Docente) :
+  docente_puo_insegnare(Materia, Docente) 
 } 1 :- classe(Classe), materia(Materia).
-
 
 %% Vincoli
 
@@ -118,12 +121,9 @@ OreMateria {
   Aula1 != Aula2.
 
 % Non possono esserci due lezioni nella stessa aula.
- :-
- orario(Classe1, Giorno, Ora, _, Aula),
- orario(Classe2, Giorno, Ora, _, Aula),
- Classe1 != Classe2.
-%Materia1 != Materia2.
 
+:-
+  orario(Classe1, Giorno, Ora, _, Aula),
+  orario(Classe2, Giorno, Ora, _, Aula),
+  Classe1 != Classe2.
 
-#show orario/5.
-#show classe_ha_docente/3.
