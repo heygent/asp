@@ -1,4 +1,5 @@
 ---
+# vim: spell spelllang=it
 title: Answer Set Programming
 subtitle: Progetto di Intelligenze Artificiali e Laboratorio - Parte 1
 author:
