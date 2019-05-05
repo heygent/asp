@@ -12,33 +12,96 @@ toc-own-page: true
 
 # Introduzione
 
-L'esercitazione prevedeva la creazione di un calendario scolastico secondo vari
-requisiti, tramite l'uso dell'applicativo clingo. In seguito spieghiamo come
-abbiamo soddisfatto i requisiti richiesti, spiegando mano a mano il codice che
-abbiamo usato.
+l'obiettivo di questa esercitazione è quello di creare un calendario accademico
+attraverso l'applicativo Clingo, parleremo di come abbiamo definito la base di
+conoscenza, gli aggregati, i vincoli e di come abbiamo gestito l'output di
+Clingo al fine di rendere la visualizzazione dei dati più agevole.
 
 ## Base di conoscenza 
 
-Per codificare la situazione iniziale, abbiamo usato vari
+- *ci sono otto aule: lettere (2 aule), matematica, tecnologia, musica, inglese,
+  spagnolo, religione*
 
+- *ci sono tre laboratori: arte, scienze, educazione fisica (palestra)*
+
+- *ci sono due docenti per ciascuno dei seguenti insegnamenti: lettere,
+  matematica, scienze*
+
+- *vi è un unico docente per tutti gli altri insegnamenti*
+
+- *30 ore complessive, da distribuire in 5 giorni (da lunedì a venerdì), 6 ore
+  al giorno*
+
+- *le classi sono: 1A,1B, 2A, 2B, 3A, 3B*
+
+Per quanto riguarda le classi, i giorni della settimana e le ore di lezione, ci
+è bastato inserire fatti diversi per ognuno di essi elencando rispettivamente
+tutte le classi i giorni e le ore. I fatti più complessi sono invece
+`ore_per_materia` in cui abbiamo associato ad ogni materia il numero di ore
+settimanali previsto, `aule_per_materia` in cui abbiamo associato ad ogni
+materia la rispettiva aula  e `docente` associando ad ogni materia il nome del
+docente di sua competenza. La regola `materia(X) :- ore_per_materia(X, _)` serve a
+poter richiamare materia attraverso `materia(Materia)` piuttosto che
+`ore_per_materia(Materia,_)` semplificando la scrittura del codice.
+<!--serve a creare dei fatti di
+sole materie a partire dai fatti `ore_per_materia` tutto ciò al solo fine poter
+richiamare le materie con `materia(Materia)` senza utilizzare
+`ore_per_materia(Materia,_)`. -->
 ```prolog
-% Tutti i docenti devono avere una classe assegnata.
+% Ore assegnate a ciascuna materia
 
-:- docente(_, Docente), not classe_ha_docente(_, _, Docente).
+ore_per_materia(
+  lettere, 10; 
+  matematica, 4;
+  scienze, 2;
+  inglese, 3;
+  spagnolo, 2;
+  musica, 2; 
+  tecnologia, 2;
+  arte, 2;
+  ed_fisica, 2;
+  religione, 1
+).
 
-% La stessa classe non può avere lezione nella stessa ora in due aule diverse.
+% Scorciatoia
 
-:- 
-  orario(Classe, Giorno, Ora, _, Aula1),
-  orario(Classe, Giorno, Ora, _, Aula2),
-  Aula1 != Aula2.
+materia(X) :- ore_per_materia(X, _).
 
-% Non possono esserci due lezioni nella stessa aula.
+% Aula assegnata a ciascuna materia
 
-:-
-  orario(Classe1, Giorno, Ora, _, Aula),
-  orario(Classe2, Giorno, Ora, _, Aula),
-  Classe1 != Classe2.
+aule_per_materia(
+    lettere, aula_lettere1;
+    lettere, aula_lettere2;
+    matematica, aula_matematica;
+    scienze, lab_scienze;
+    inglese, aula_inglese;
+    spagnolo, aula_spagnolo;
+    musica, aula_musica;
+    tecnologia, aula_tecnologia;
+    arte, lab_arte;
+    ed_fisica, lab_ed_fisica;
+    religione, aula_religione
+).
+
+% Nome assegnato a ciascun docente
+
+docente(
+  lettere, "Lucia Lettere1"; 
+  lettere, "Annalisa Lettere2"; 
+  matematica, "Pozzo Matematica";
+  scienze, "Paolo Scienze1"; 
+  scienze, "Andrea Scienze2"; 
+  scienze, "Luca Scienze3"; 
+  scienze, "Gianni Scienze4";
+  inglese, "Michele inglese"; 
+  spagnolo, "Pierpaolo spagnolo"; 
+  musica, "Ernesto musica"; 
+  tecnologia, "Tecna Tecnologia"; 
+  arte, "Picassa Arte";
+  ed_fisica, "Pantani EdFisica";
+  religione, "SanPeppe religione"
+).
+
 ```
 
 ## Aggregati 
@@ -98,7 +161,7 @@ class PredicateParser:
             for argname, _, argtype in self.arglist:
                 parsed_args[argname] = argtype(parsed_args[argname])
 
-            yield self.result_tuple(**parsed_args)
+            yield self.result_tuple(`parsed_args)
 ```
 
 ## Conclusioni
