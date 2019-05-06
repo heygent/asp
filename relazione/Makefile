@@ -1,3 +1,5 @@
+out/relazione.pdf: $(wildcard *.md) | out
+	pandoc -t latex --toc --listings --template $(CURDIR)/eisvogel.tex -o $@ $^
 
-out/relazione.pdf: $(wildcard *.md)
-	pandoc -t latex --toc --template $(CURDIR)/eisvogel.tex -o $@ $^
+out:
+	mkdir out

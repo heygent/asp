@@ -52,11 +52,10 @@ aule_per_materia(
 docente(
   lettere, "Lucia Lettere1"; 
   lettere, "Annalisa Lettere2"; 
-  matematica, "Pozzo Matematica";
+  matematica, "Rob Matematica1";
+  matematica, "John Matematica2";
   scienze, "Paolo Scienze1"; 
   scienze, "Andrea Scienze2"; 
-  scienze, "Luca Scienze3"; 
-  scienze, "Gianni Scienze4";
   inglese, "Michele inglese"; 
   spagnolo, "Pierpaolo spagnolo"; 
   musica, "Ernesto musica"; 
@@ -127,3 +126,6 @@ OreMateria {
   orario(Classe2, Giorno, Ora, _, Aula),
   Classe1 != Classe2.
 
+
+#show orario/5.
+#show classe_ha_docente/3.

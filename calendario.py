@@ -63,11 +63,12 @@ CLASSE_HA_DOCENTE_PARSER = PredicateParser('classe_ha_docente', [
 ])
 
 
-def make_classe_table_dict(righe_orario):
+def make_classe_table_dict(righe_orario, attr_names):
     orario = { giorno: [] for giorno in GiornoSettimana }
 
-    for _, giorno, ora, materia, aula, *_ in righe_orario:
-        orario[giorno].append('\n'.join((str(ora), materia, aula)))
+    for riga_orario in righe_orario:
+        data = map(lambda attrname: str(getattr(riga_orario, attrname)), attr_names)
+        orario[riga_orario.giorno].append('\n\n'.join(data))
 
     return orario
 
@@ -87,30 +88,38 @@ def make_docenti_table_dict(pred_tuples):
     return docenti, materie
 
 
-def print_summary(righe, docenti):
+def print_summary(righe, docenti, cell_data):
     for classe, righe_classe in groupby(righe, lambda r: r.classe):
-        orario_classe = make_classe_table_dict(righe_classe)
+        orario_classe = make_classe_table_dict(righe_classe, cell_data)
 
-        print(f'\nClasse {classe}\n')
+        print()
         print(
             tabulate(orario_classe,
                      tablefmt='grid',
                      headers='keys',
                      showindex=range(1, 7)))
+        print(f'\nTable: Orario della classe {classe}\n')
 
     docenti, materie = make_docenti_table_dict(docenti)
-    print('\nDocenti\n')
+    print()
     print(tabulate(docenti, headers='keys', showindex=materie))
+    print('\nTable: Assegnazione dei docenti\n')
 
 
 if __name__ == '__main__':
 
+    class Split(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            setattr(namespace, self.dest, values.split(','))
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--tsv', action='store_true')
+    parser.add_argument('--clingo-output', action='store_true')
     parser.add_argument('infile',
                         type=argparse.FileType('r'),
                         nargs='?',
                         default=sys.stdin)
+    parser.add_argument('--cell-data', action=Split, default=['materia', 'aula'])
     ns = parser.parse_args()
 
     with ns.infile:
@@ -124,5 +133,6 @@ if __name__ == '__main__':
         for riga in righe:
             print('\t'.join(map(str, riga)))
     else:
-        print(input_str)
-        print_summary(righe, docenti)
+        if ns.clingo_output:
+            print(input_str)
+        print_summary(righe, docenti, ns.cell_data)

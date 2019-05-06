@@ -300,7 +300,7 @@ $if(listings)$
 $endif$
 $if(listings-no-page-break)$
 \usepackage{etoolbox}
-\BeforeBeginEnvironment{lstlisting}{\par\noindent\begin{minipage}{\linewidth}}
+\BeforeBeginEnvironment{lstlisting}{\par\noindent\newline\begin{minipage}{\linewidth}}
 \AfterEndEnvironment{lstlisting}{\end{minipage}\par\addvspace{\topskip}}
 $endif$
 $if(lhs)$
