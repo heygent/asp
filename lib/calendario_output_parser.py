@@ -48,7 +48,7 @@ ORARIO_PARSER = PredicateParser('orario', [
 CLASSE_HA_DOCENTE_PARSER = PredicateParser('classe_ha_docente', [
     ('classe', SYMBOL_RE, str),
     ('materia', SYMBOL_RE, str),
-    ('docente', STRING_RE, str),
+    ('docente', SYMBOL_RE, str),
 ])
 
 calendario_model = namedtuple('calendario_model',

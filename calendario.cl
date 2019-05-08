@@ -50,19 +50,19 @@ aule_per_materia(
 % Docenti
 
 docente(
-  lettere, "Lucia Lettere1"; 
-  lettere, "Annalisa Lettere2"; 
-  matematica, "Rob Matematica1";
-  matematica, "John Matematica2";
-  scienze, "Paolo Scienze1"; 
-  scienze, "Andrea Scienze2"; 
-  inglese, "Michele inglese"; 
-  spagnolo, "Pierpaolo spagnolo"; 
-  musica, "Ernesto musica"; 
-  tecnologia, "Tecna Tecnologia"; 
-  arte, "Picassa Arte";
-  ed_fisica, "Pantani EdFisica";
-  religione, "SanPeppe religione"
+  lettere, doc_lettere1; 
+  lettere, doc_lettere2; 
+  matematica, doc_matematica1;
+  matematica, doc_matematica2;
+  scienze, doc_scienze1; 
+  scienze, doc_scienze2; 
+  inglese, doc_inglese; 
+  spagnolo, doc_spagnolo; 
+  musica, doc_musica; 
+  tecnologia, doc_tecnologia; 
+  arte, doc_arte;
+  ed_fisica, doc_edfisica;
+  religione, doc_religione 
 ).
 
 % Le materie che i docenti sono abilitati ad insegnare.

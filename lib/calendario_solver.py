@@ -1,3 +1,4 @@
+import os
 import clingo
 from collections import namedtuple
 from enum import IntEnum
@@ -19,11 +20,14 @@ classe_ha_docente = namedtuple('classe_ha_docente', 'classe materia docente')
 calendario_model = namedtuple('calendario_model',
                               'orario classe_ha_docente number')
 
+CALENDARIO_FILE_PATH = os.path.realpath(
+    os.path.relpath('../asp/calendario.cl', start=__file__))
+
 
 class CalendarioSolver:
     def __init__(self, arguments):
         self.control = clingo.Control(arguments=arguments)
-        self.control.load('calendario.cl')
+        self.control.load(CALENDARIO_FILE_PATH)
         self.control.ground(parts=[("base", [])])
 
     def _extract_data(self, clingo_model):
@@ -42,7 +46,7 @@ class CalendarioSolver:
 
                 model.classe_ha_docente.append(
                     classe_ha_docente(args[0].name, args[1].name,
-                                      args[2].string))
+                                      args[2].name))
 
         model.orario.sort()
         model.classe_ha_docente.sort()

@@ -1,3 +1,5 @@
+#include "calendario.cl".
+
 % Se ci sono più ore di una materia in uno stesso giorno, devono essere
 % consecutive.
 
