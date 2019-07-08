@@ -1,7 +1,7 @@
-import os
 import clingo
 from collections import namedtuple
 from enum import IntEnum
+from pathlib import Path
 
 
 class GiornoSettimana(IntEnum):
@@ -20,9 +20,7 @@ classe_ha_docente = namedtuple('classe_ha_docente', 'classe materia docente')
 calendario_model = namedtuple('calendario_model',
                               'orario classe_ha_docente number')
 
-CALENDARIO_FILE_PATH = os.path.realpath(
-    os.path.relpath('../asp/calendario.cl', start=__file__))
-
+CALENDARIO_FILE_PATH = str(Path(__file__).parent.parent / 'calendario.cl')
 
 class CalendarioSolver:
     def __init__(self, arguments):

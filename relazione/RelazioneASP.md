@@ -7,8 +7,12 @@ author:
   - Alessandro Caputo
 lang: it
 titlepage: true
+titlepage-color: a20021
+titlepage-text-color: ededf4
+titlepage-rule-color: ededf4
 toc-own-page: true
 listings-disable-line-numbers: true
+
 ---
 
 # Introduzione
@@ -251,12 +255,18 @@ Nel programma principale, siamo riusciti a far generare a Clingo circa due
 miliardi e mezzo di Answer Set possibili. La ricerca di soluzioni non è stata
 esaustiva, ma è stata interrotta per ragioni di tempo.
 
-Per permettere una visualizzazione più agevole dei risultati abbiamo usato un
+Per permettere una visualizzazione più agevole dei risultati abbiamo scritto un
 programma Python. Il programma può fare il parsing dell'output di Clingo e
 stampare i dati contenuti negli Answer Set in forma di tabelle ASCII, o
 convertirli in formato Tab Separated Values. Se il modulo Python ufficiale di
 Clingo è presente nel sistema, è possibile anche far eseguire il solver
 direttamente allo script.
+
+```sh
+# Esempi d'uso dello script calendario.py
+./calendario.py --solve 1
+clingo calendario.cl | ./calendario.py
+```
 
 In appendice, alleghiamo il primo Answer Set prodotto da Clingo, il cui markup
 per la visualizzazione in questo documento è generato direttamente dal
